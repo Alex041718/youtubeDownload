@@ -7,7 +7,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'
 s = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 
-# Route pour demander au server de télécharger l'audio de la vidéo
+# Route pour demander au server de telecharger l audio de la video
 @app.route('/generate_download_link', methods=['GET'])
 def generate_download_link():
     video_url = request.args.get('video_url')
@@ -20,13 +20,13 @@ def generate_download_link():
         audio_stream = youtube_video.streams.filter(only_audio=True).first()
 
         title = re.sub(r'\s+', '-', youtube_video.title)
-        # Télécharger l'audio dans le dossier downloads
+        # Telecharger l'audio dans le dossier downloads
         audio_stream.download(output_path='downloads', filename=title+'.mp3')
 
 
-        # Générer un token sécurisé avec une durée de validité
+        # Generer un token securise avec une duree de validite
         token = s.dumps(title, salt='download-link')
-        # Générer le lien de téléchargement
+        # Generer le lien de telechargement
         download_link = f'http://localhost:5001/download/{token}'
         return jsonify({'download_link': download_link})
     except Exception as e:
@@ -34,17 +34,17 @@ def generate_download_link():
     
     
     
-# Route pour télécharger le fichier
+# Route pour telecharger le fichier
 @app.route('/download/<token>', methods=['GET'])
 def secure_download(token):
     try:
-        # Vérifier le token et sa validité
-        title = s.loads(token, salt='download-link', max_age=3600)  # Durée de validité de 1 heure
+        # Verifier le token et sa validite
+        title = s.loads(token, salt='download-link', max_age=3600)  # Duree de validite de 1 heure
 
-        # Générer le chemin complet vers le fichier
+        # Generer le chemin complet vers le fichier
         file_path = f'downloads/{title}.mp3'
 
-        # Fournir le fichier en téléchargement
+        # Fournir le fichier en telechargement
         return send_file(file_path, as_attachment=True)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -52,9 +52,9 @@ def secure_download(token):
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
 
-"""Le client envoie une requête GET à votre API pour télécharger une vidéo spécifique. Votre API génère un lien de téléchargement sécurisé et temporisé, et renvoie ce lien dans la réponse JSON.
-Le client reçoit la réponse JSON de l'API contenant le lien de téléchargement sécurisé.
-Le client clique sur le lien de téléchargement dans la réponse JSON, ce qui déclenche une nouvelle requête GET vers l'URL du lien sécurisé.
-Le serveur de l'API reçoit la requête pour le lien sécurisé et vérifie la validité du token.
-Si le token est valide et que la durée de validité n'est pas dépassée, le serveur de l'API renvoie le fichier à télécharger au client en utilisant la fonction send_file() de Flask.
-Le client reçoit le fichier en réponse à sa requête et peut l'enregistrer localement sur son appareil."""
+"""Le client envoie une requête GET à votre API pour telecharger une video specifique. Votre API genère un lien de telechargement securise et temporise, et renvoie ce lien dans la reponse JSON.
+Le client reçoit la reponse JSON de l'API contenant le lien de telechargement securise.
+Le client clique sur le lien de telechargement dans la reponse JSON, ce qui declenche une nouvelle requête GET vers l'URL du lien securise.
+Le serveur de l'API reçoit la requête pour le lien securise et verifie la validite du token.
+Si le token est valide et que la duree de validite n'est pas depassee, le serveur de l'API renvoie le fichier à telecharger au client en utilisant la fonction send_file() de Flask.
+Le client reçoit le fichier en reponse à sa requête et peut l'enregistrer localement sur son appareil."""
