@@ -27,7 +27,7 @@ def generate_download_link():
         # Generer un token securise avec une duree de validite
         token = s.dumps(title, salt='download-link')
         # Generer le lien de telechargement
-        download_link = f'http://localhost:5001/download/{token}'
+        download_link = f'http://51.38.35.91:5001/download/{token}'
         return jsonify({'download_link': download_link})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
